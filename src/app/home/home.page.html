@@ -1,8 +1,10 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      Blank
-    </ion-title>
+    <ion-buttons slot="start">
+      <ion-button>File</ion-button>
+      <ion-button>Edit</ion-button>
+      <ion-button>View</ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -13,8 +15,18 @@
     </ion-toolbar>
   </ion-header>
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+  <div class="grid-container" style="height: 100%; overflow: scroll;">
+    <dts-select-container #container="dts-select-container"
+    [(selectedItems)]="selectedDocuments" (itemSelected)="itemSelected($event)" (itemDeselected)="itemDeselected($event)">
+      <ion-row [style.width]="100 * row.length + 'px'" *ngFor="let row of dataBlock; let rowIndex=index;"
+        class="ion-justify-content-center">
+        <ion-col [id]="cell.id" [dtsSelectItem]="cell" *ngFor="let cell of row; let columnIndex=index; trackBy:trackByFn" [class]="cell.id + ' cell'" [ngClass]="dataBlock[rowIndex][columnIndex].status">
+          {{ cell.value }}
+          <!-- <ion-input [(ngModel)]="dataBlock[rowIndex][columnIndex].value"
+            (click)="setActiveRange(rowIndex, columnIndex, rowIndex, columnIndex)" (drag)="hello()"></ion-input> -->
+        </ion-col>
+      </ion-row>
+    </dts-select-container>
   </div>
+
 </ion-content>

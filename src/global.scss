@@ -24,3 +24,8 @@
 @import "~@ionic/angular/css/text-alignment.css";
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
+
+$box-shadow: false;
+$selected-item-border: false;
+$range-start-border: false;
+@import '~ngx-drag-to-select/scss/ngx-drag-to-select';
