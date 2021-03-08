@@ -1,4 +1,4 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-button>File</ion-button>
@@ -8,25 +8,17 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
-  <div class="grid-container" style="height: 100%; overflow: scroll;">
-    <dts-select-container #container="dts-select-container"
-    [(selectedItems)]="selectedDocuments" (itemSelected)="itemSelected($event)" (itemDeselected)="itemDeselected($event)">
-      <ion-row [style.width]="100 * row.length + 'px'" *ngFor="let row of dataBlock; let rowIndex=index;"
-        class="ion-justify-content-center">
-        <ion-col [id]="cell.id" [dtsSelectItem]="cell" *ngFor="let cell of row; let columnIndex=index; trackBy:trackByFn" [class]="cell.id + ' cell'" [ngClass]="dataBlock[rowIndex][columnIndex].status">
-          {{ cell.value }}
-          <!-- <ion-input [(ngModel)]="dataBlock[rowIndex][columnIndex].value"
-            (click)="setActiveRange(rowIndex, columnIndex, rowIndex, columnIndex)" (drag)="hello()"></ion-input> -->
-        </ion-col>
-      </ion-row>
-    </dts-select-container>
+<ion-content>
+  <div class="grid-container">
+    <table>
+      <tr *ngFor="let row of dataBlock; let i = index">
+        <td [ngClass]="dataBlock[i][j].status" 
+          (mouseup)="mouseUp(i, j)" (mousedown)="mouseDown(i, j)"
+          (mouseover)="mouseOver($event, i, j)" (mouseleave)="mouseLeave($event, i, j)" *ngFor="let cell of row; let j = index; trackByItems"
+          style="min-width: 100px; max-width: 100px;" class="cell">
+          <ion-input style="padding: 5" type="text" [(ngModel)]="dataBlock[i][j].value"></ion-input>
+        </td>
+      </tr>
+    </table>
   </div>
-
 </ion-content>

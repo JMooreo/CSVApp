@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { Cell } from '../models/cell';
-import anime from "animejs/lib/anime.es.js";
 
 @Component({
   selector: 'app-home',
@@ -9,11 +8,18 @@ import anime from "animejs/lib/anime.es.js";
 })
 export class HomePage {
   dataBlock: Cell[][] = [];
-  selectedItems = [];
-  numRows = 10;
+  lastCoordinates = {
+    x: 0,
+    y: 0,
+  }
+  selectedArea = {
+    x1: 0,
+    y1: 0,
+    x2: 0,
+    y2: 0,
+  };
+  numRows = 50;
   numColumns = 20;
-  numExtraRows = 10;
-  numExtraColumns = 0;
 
   selectedStyle = {
     highlightColor: "#AFF9C9",
@@ -36,24 +42,9 @@ export class HomePage {
     for (var i = 0; i < this.numRows; i++) {
       for (var j = 0; j < this.numColumns; j++) {
         id++
-        row.push({id, rowIndex: i, columnIndex: j, value: j.toString(), status: 'deselected'} as Cell);
+        row.push({ id, rowIndex: i, columnIndex: j, value: j.toString(), status: 'deselected' } as Cell);
       }
 
-      for (var j = 0; j < this.numExtraRows; j++) {
-        id++;
-        row.push({id, rowIndex: i, columnIndex: this.numColumns + j, value: "", status: 'inactive'} as Cell);
-      }
-
-      this.dataBlock.push(row);
-      row = []
-    }
-
-
-    for (var i = 0; i < this.numExtraRows; i++) {
-      for (var j = 0; j < this.numColumns + this.numExtraColumns; j++) {
-        id++
-        row.push({id, rowIndex: this.numRows + i, columnIndex: j, value: "", status: 'inactive'} as Cell);
-      }
       this.dataBlock.push(row);
       row = []
     }
@@ -69,36 +60,77 @@ export class HomePage {
     return index;
   }
 
-  public itemSelected(cell: Cell) {
+  public async mouseOver(event: any, rowIndex: number, columnIndex: number) {
+    let buttonPressed = event.which;
+    this.lastCoordinates = { x: event.x, y: event.y }
+    const { x1, y1 } = this.selectedArea;
+    let minRowIndex = Math.min(x1, rowIndex);
+    let maxRowIndex = Math.max(x1, rowIndex);
+    let minColIndex = Math.min(y1, columnIndex);
+    let maxColIndex = Math.max(y1, columnIndex);
 
-    var el = document.getElementById(cell.id.toString())
-    anime({
-      targets: el,
-      backgroundColor: this.selectedStyle.highlightColor,
-      borderColor: this.selectedStyle.borderColor,
-      easing: 'easeOutCubic',
-      duration: 0
-    });
-  }
-
-  public itemDeselected(cell: Cell) {
-    var el = document.getElementById(cell.id.toString())
-    if (cell.status == 'deselected') {
-      anime({
-        targets: el,
-        backgroundColor: this.deselectedStyle.highlightColor,
-        borderColor: this.deselectedStyle.borderColor,
-        duration: 0
-      })
-    } else {
-      anime({
-        targets: el,
-        backgroundColor: this.inactiveStyle.highlightColor,
-        borderColor: this.inactiveStyle.borderColor,
-        duration: 0
-      })
+    if (buttonPressed == 1) {
+      for (let i = minRowIndex; i <= maxRowIndex; i++) {
+        for (let j = minColIndex; j <= maxColIndex; j++) {
+          this.dataBlock[i][j].status = 'selected';
+        }
+      }
     }
-    
   }
 
+  public async mouseLeave(event: any, rowIndex: number, columnIndex: number) {
+    let buttonPressed = event.which;
+    const { x, y } = this.lastCoordinates;
+    const { x1, y1 } = this.selectedArea;
+
+    let minRowIndex = Math.min(x1, rowIndex);
+    let maxRowIndex = Math.max(x1, rowIndex);
+    let minColIndex = Math.min(y1, columnIndex);
+    let maxColIndex = Math.max(y1, columnIndex);
+
+    if (buttonPressed == 1) {
+      if ((rowIndex > x1 && event.y < y) || (rowIndex < x1 && event.y > y)) { // Handle Rows
+        for (let j = minColIndex; j <= maxColIndex; j++) {
+          this.dataBlock[rowIndex][j].status = 'deselected';
+        }
+      }
+
+      if ((columnIndex > y1 && event.x < x) || (columnIndex < y1 && event.x > x)) { // Handle Columns
+        for (let i = minRowIndex; i <= maxRowIndex; i++) {
+          this.dataBlock[i][columnIndex].status = 'deselected';
+        }
+      }
+    }
+  }
+
+  public async mouseDown(rowIndex: number, columnIndex: number) {
+    this.selectedArea.x1 = rowIndex;
+    this.selectedArea.y1 = columnIndex;
+    this.dataBlock.forEach(row => {
+      row.forEach(cell => {
+        cell.status = 'deselected'
+      })
+    })
+    console.log("Mouse Down", this.selectedArea)
+  }
+
+  public async mouseUp(rowIndex: number, columnIndex: number) {
+    this.selectedArea.x2 = rowIndex;
+    this.selectedArea.y2 = columnIndex;
+    console.log("Mouse Up", this.selectedArea)
+    const { x1, y1 } = this.selectedArea;
+    let minRowIndex = Math.min(x1, rowIndex);
+    let maxRowIndex = Math.max(x1, rowIndex);
+    let minColIndex = Math.min(y1, columnIndex);
+    let maxColIndex = Math.max(y1, columnIndex);
+
+    this.dataBlock.forEach((row, rowIndex) => {
+
+      row.forEach((cell, columnIndex) => {
+        if (rowIndex < minRowIndex || columnIndex < minColIndex || rowIndex > maxRowIndex || columnIndex > maxColIndex) {
+          cell.status = 'deselected'
+        }
+      })
+    })
+  }
 }

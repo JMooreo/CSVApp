@@ -1,7 +1,13 @@
 .cell {
   text-align: center;
   border: 0.5px solid lightgray;
-  height: 30px
+  height: 22px
+}
+
+.selected {
+  background-color: #AFF9C9;
+  border: 1px solid #7CF0BD;
+
 }
 
 .deselected {
@@ -9,7 +15,19 @@
   border: 0.5px solid #ECECEC;
 }
 
-.inactive {
-  background-color: #EEEEEE;
-  border: 0.5px solid #DDDDDD;
+.grid-container {
+  overflow: scroll;
+  position: fixed;
+  padding-top: 100px;
+  padding-left: 100px;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+
+ion-input {
+  --padding-bottom: 0px;
+  --padding-start: 0px;
+  --padding-top: 0px;
 }
